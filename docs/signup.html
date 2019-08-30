@@ -9,6 +9,16 @@
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'UA-146480469-1');
+
+    window.addEventListener("load", function(){
+        if(window.ga && ga.create) {
+          ga('create', 'UA-146480469-1', 'auto');
+          console.info("ga tracker successfully created");
+        } else {
+          console.warn("ga tracker not created");
+        }
+    }, false);
+
   </script>
   <title>Snowman Sign Up</title>
   <script src="//api.salemove.com/salemove_integration.js"></script>
