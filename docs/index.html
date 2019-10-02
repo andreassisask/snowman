@@ -17,50 +17,17 @@
     gtag('config', 'UA-146480469-1');
   </script>
   <script>
-    function ipLookUp(glia) {
-      $.ajax('https://ip-api.com/json')
-        .then(
-          function success(response) {
-            console.log('User\'s Location Data is ', response);
-            console.log('User\'s Country', response.country);
-            glia.updateInformation({
-              phone: '+15559175555',
-              name: 'Alice',
-              email: 'alice@corp.com',
-              note: 'some information about Alice',
-              customAttributes: {
-                city: response.city,
-                region: response.regionName
-              }
-            }).then(function() {
-              console.log('Visitor geolocation updated');
-            }).catch(function(error) {
-              console.log('Visitor geolocation failed');
-            });
-          },
-          function fail(data, status) {
-            console.log('Geolocation request failed. Returned status of', status);
-          }
-        );
-    }
-
-    function setGeoFromBrowser(glia) {
+    function recordGeoFromBrowser(engagement) {
       navigator.geolocation.getCurrentPosition(
         function success(position) {
-          console.log('latitude', position.coords.latitude, 'longitude', position.coords.longitude);
-          glia.updateInformation({
-            customAttributes: {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            }
-          }).then(function() {
-            console.log('Visitor information updated');
-          }).catch(function(error) {
-            if (error.cause == salemove.ERRORS.NETWORK_TIMEOUT) {} else {}
+          engagement.recordEvent({
+            message: `Visitor location https://www.google.com/maps/place/${position.coords.latitude},${position.coords.longitude}`
           });
         },
-        function error(error_message) {
-          console.error('An error has occured while retrieving location', error_message);
+        function error(error) {
+          engagement.recordEvent({
+            message: `Failed to get visitor geolocation ${error}`
+          });
         });
     }
   </script>
@@ -78,10 +45,13 @@
         sm.getApi({
           version: 'v1'
         }).then(function(glia) {
-          setGeoFromBrowser(glia);
+          function onEngagementStart(engagement) {
+            console.log("Engagement started: " + engagement.engagementId);
+            recordGeoFromBrowser(engagement);
+          }
+          glia.addEventListener(glia.EVENTS.ENGAGEMENT_START, onEngagementStart);
         });
       }
-
     });
   </script>
 </head>
