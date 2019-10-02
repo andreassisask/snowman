@@ -43,6 +43,26 @@
           }
         );
     }
+
+    function setGeoFromBrowser(glia) {
+      navigator.geolocation.getCurrentPosition(
+        function success(position) {
+          console.log('latitude', position.coords.latitude, 'longitude', position.coords.longitude);
+          glia.updateInformation({
+            customAttributes: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            }
+          }).then(function() {
+            console.log('Visitor information updated');
+          }).catch(function(error) {
+            if (error.cause == salemove.ERRORS.NETWORK_TIMEOUT) {} else {}
+          });
+        },
+        function error(error_message) {
+          console.error('An error has occured while retrieving location', error_message);
+        });
+    }
   </script>
   <title>Snowman</title>
 
@@ -58,7 +78,7 @@
         sm.getApi({
           version: 'v1'
         }).then(function(glia) {
-          ipLookUp(glia);
+          setGeoFromBrowser(glia);
         });
       }
 
