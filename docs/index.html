@@ -60,7 +60,8 @@
         version: 'v1'
       }).then(function(glia) {
         var params = {
-          "authentication_provider_id": "3a596532-c868-4071-befa-3706ecc2c552"
+          "authentication_provider_id": "3a596532-c868-4071-befa-3706ecc2c552",
+          "webhooks":[]
         };
         glia.createAuthenticationRequest(params);
       });
