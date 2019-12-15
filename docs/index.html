@@ -6,7 +6,6 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146480469-1"></script>
-
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -30,7 +29,6 @@
           });
         });
     }
-
   </script>
   <title>Snowman</title>
 
@@ -55,11 +53,28 @@
       }
     });
   </script>
+  <script>
+    function login() {
+      console.log("Login");
+      sm.getApi({
+        version: 'v1'
+      }).then(function(glia) {
+        var params = {
+          "authentication_provider_id": "3a596532-c868-4071-befa-3706ecc2c552"
+        };
+        glia.createAuthenticationRequest(params);
+      });
+    }
+  </script>
+
 </head>
 
 <body>
   <div align="center" id="a">
     <a href="signup.html"><img src="https://images.step2.com/images/products/v2/retina/485700_001.jpg" alt="Let it snow"></a>
+  </div>
+  <div align="center" id="a">
+    <button onclick="login()">Login</button>
   </div>
 </body>
 
