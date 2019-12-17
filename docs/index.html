@@ -61,13 +61,23 @@
       }).then(function(glia) {
         var params = {
           "authentication_provider_id": "289d329f-02d6-4d2e-8c42-d3c7d542a2c3",
-          "webhooks":[]
+          "webhooks": []
         };
         glia.createAuthenticationRequest(params);
       });
     }
   </script>
-
+  <script>
+    function setLocale() {
+      var localeKey = document.getElementById("localesList").value;
+      console.log("setLocale to " + localeKey);
+      sm.getApi({
+        version: 'v1'
+      }).then(function(glia) {
+        glia.setLocale(localeKey);
+      });
+    }
+  </script>
 </head>
 
 <body>
@@ -76,6 +86,12 @@
   </div>
   <div align="center" id="main">
     <a href="signup.html"><img src="https://images.step2.com/images/products/v2/retina/485700_001.jpg" alt="Let it snow"></a>
+  </div>
+  <div align="center" id="locale">
+    <select id="localesList" onchange="setLocale()">
+      <option value="de-DE">German</option>
+      <option value="de-DE-AS">German Customized</option>
+    </select>
   </div>
 </body>
 
