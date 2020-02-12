@@ -78,9 +78,23 @@
       });
     }
   </script>
+  <script>
+    //Place the following script in the footer
+    sm.getApi().then(
+      function(salemoveApi) {
+        salemoveApi.setupContactOperatorButton({
+          withOperatorsHtml: "<button>Ops</button>",
+          withoutOperatorsHtml: '<button>Nops</button>',
+          withoutOperatorsCallback: function() {}
+        });
+      },
+      function(err) {}
+    );
+  </script>
 </head>
 
 <body>
+  <div class="salemove-button">
   <a data-sm-show-media-selection-on="click" href="javascript:void(0);">
     Start a call!
   </a>
