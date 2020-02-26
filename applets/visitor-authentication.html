@@ -1,0 +1,57 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+  <script type="text/javascript" src="//libs.glia.com/axon.js"></script>
+</head>
+<script>
+  function visitorStateChange(visitor) {
+    document.getElementById("authenticatedAttributes.visitorName.value").innerHTML = visitor.authenticatedAttributes.visitorName || '-';
+    document.getElementById("authenticatedAttributes.visitorPreferredName.value").innerHTML = visitor.authenticatedAttributes.visitorPreferredName || '-';
+    document.getElementById("authenticatedAttributes.visitorEmail.value").innerHTML = visitor.authenticatedAttributes.visitorEmail || '-';
+    document.getElementById("authenticatedAttributes.authenticationProviderId.value").innerHTML = visitor.authenticatedAttributes.authenticationProviderId || '-';
+    document.getElementById("authenticatedAttributes.issuer.value").innerHTML = visitor.authenticatedAttributes.issuer || '-';
+    document.getElementById("authenticatedAttributes.subject.value").innerHTML = visitor.authenticatedAttributes.subject || '-';
+    document.getElementById("authenticatedAttributes.accessToken.value").innerHTML = visitor.authenticatedAttributes.accessToken || '-';
+    document.getElementById("authenticatedAttributes.authenticatedAt.value").innerHTML = visitor.authenticatedAttributes.authenticatedAt || '-';
+  }
+
+  window.getGliaApi({
+      version: 'v1'
+    })
+    .then(glia => {
+      console.log('axon got glia api')
+      glia.addBufferedEventListener(glia.EVENTS.VISITOR_STATE, visitorStateChange)
+    });
+</script>
+
+<body>
+  <table class="pure-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Preferred Name</th>
+        <th>Email</th>
+        <th>Provider ID</th>
+        <th>Issuer</th>
+        <th>Subject</th>
+        <th>Access Token</th>
+        <th>Authenticated At</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td id="authenticatedAttributes.visitorName.value"></td>
+        <td id="authenticatedAttributes.visitorPreferredName.value"></td>
+        <td id="authenticatedAttributes.visitorEmail.value"></td>
+        <td id="authenticatedAttributes.authenticationProviderId.value"></td>
+        <td id="authenticatedAttributes.issuer.value"></td>
+        <td id="authenticatedAttributes.subject.value"></td>
+        <td id="authenticatedAttributes.accessToken.value"></td>
+        <td id="authenticatedAttributes.authenticatedAt.value"></td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>
