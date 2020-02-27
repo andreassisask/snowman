@@ -38,7 +38,7 @@
 
   //When receiving a number of chat messages
   function onChatMessages(messages) {
-    console.debug("Received chat messages");
+    console.debug("Received chat messages" + JSON.stringify(message));
     let msgTbl = document.getElementById("msgTbl");
     if (messages && messages.length > 0) {
 
@@ -83,7 +83,7 @@
                 version: 'v1'
               })
               .then(glia => {
-                glia.sendMessage({
+                glia.sendChatMessage({
                   content: translationPayload.data.translations[0].translatedText
                 });
                 console.debug("Sent message to chat");
