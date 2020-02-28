@@ -38,7 +38,7 @@
 
   //When receiving a number of chat messages
   function onChatMessages(messages) {
-    console.debug("Received chat messages" + JSON.stringify(message));
+    console.debug("Received chat messages" + JSON.stringify(messages));
     let msgTbl = document.getElementById("msgTbl");
     if (messages && messages.length > 0) {
 
@@ -98,15 +98,15 @@
     let msgForm = document.getElementById("msgForm");
     msgForm.addEventListener('submit', sendChatMessage);
     console.debug("Input listener ready.");
+    window.getGliaApi({
+        version: 'v1'
+      })
+      .then(glia => {
+        glia.addBufferedEventListener(glia.EVENTS.CHAT_MESSAGES, onChatMessages);
+        console.debug("Messages listener ready.");
+      });    
   });
 
-  window.getGliaApi({
-      version: 'v1'
-    })
-    .then(glia => {
-      glia.addBufferedEventListener(glia.EVENTS.CHAT_MESSAGES, onChatMessages);
-      console.debug("Messages listener ready.");
-    });
 </script>
 
 <body>
