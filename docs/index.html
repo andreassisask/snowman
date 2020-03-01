@@ -29,16 +29,6 @@
           });
         });
     }
-
-    function onQueueStateUpdate(queueState) {
-      console.debug("Queue state updated: " + queueState);
-      const element = document.querySelector('[data-sm-show-media-selection-on]');
-      if (queueState.state !== queueState.QUEUE_STATES.CAN_QUEUE) {
-        element.style.display = 'none';
-      } else {
-        element.style.display = 'block';
-      }
-    }
   </script>
   <title>Snowman</title>
 
@@ -57,6 +47,16 @@
           function onEngagementStart(engagement) {
             console.log("Engagement started: " + engagement.engagementId);
             recordGeoFromBrowser(engagement);
+          }
+
+          function onQueueStateUpdate(queueState) {
+            console.debug("Queue state updated: " + queueState);
+            const element = document.querySelector('[data-sm-show-media-selection-on]');
+            if (queueState.state !== queueState.QUEUE_STATES.CAN_QUEUE) {
+              element.style.display = 'none';
+            } else {
+              element.style.display = 'block';
+            }
           }
           glia.addEventListener(glia.EVENTS.ENGAGEMENT_START, onEngagementStart);
           glia.addEventListener(glia.EVENTS.QUEUE_STATE_UPDATE, onQueueStateUpdate);
@@ -91,7 +91,9 @@
   </script>
   <script>
     //Place the following script in the footer
-    sm.getApi().then(
+    sm.getApi({
+      version: 'v1'
+    }).then(
       function(salemoveApi) {
         salemoveApi.setupContactOperatorButton({
           withOperatorsHtml: `<img src="http://pngimg.com/uploads/buttons/buttons_PNG161.png"/>`,
