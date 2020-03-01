@@ -31,6 +31,7 @@
     }
 
     function onQueueStateUpdate(queueState) {
+      console.debug("Queue state updated: " + queueState);
       const element = document.querySelector('[data-sm-show-media-selection-on]');
       if (queueState.state !== queueState.QUEUE_STATES.CAN_QUEUE) {
         element.style.display = 'none';
