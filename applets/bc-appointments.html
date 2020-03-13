@@ -1,0 +1,219 @@
+<html>
+
+<head>
+  <!-- This needs to be changed to https://operator-api-cdn.local.dev/axon.js in local Axon JS API is needed -->
+  <script type="text/javascript" src="https://libs.glia.com/axon.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+</head>
+<script>
+  function formatDate(date) {
+    return date.toISOString().substring(0, 16) + "+0000";
+  };
+
+  function createTomorrowMortgagePayload(reqId) {
+    let tomorrow = new Date(Date.now() + 86400000);
+    let slot1 = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 10, 00, 0, 0);
+    let slot2 = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 11, 30, 0, 0);
+    let slot3 = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 14, 00, 0, 0);
+
+    let payload = {
+      content: 'Time picker for meeting with loan specialist sent.',
+      metadata: {
+        type: 'interactive',
+        interactiveData: {
+          bid: 'com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension',
+          data: {
+            version: '1.0',
+            requestIdentifier: reqId,
+            event: {
+              title: "Appointment time for loan.",
+              location: {
+                title: "Building Two",
+                radius: 10,
+                latitude: 58.5,
+                longitude: 122
+              },
+              timeslots: [{
+                  duration: 1800,
+                  startTime: formatDate(slot1),
+                  identifier: "D4101D55"
+                },
+                {
+                  duration: 1800,
+                  startTime: formatDate(slot2),
+                  identifier: "0629060F"
+                },
+                {
+                  duration: 1800,
+                  startTime: formatDate(slot3),
+                  identifier: "9A0FF16A"
+                }
+              ],
+              identifier: "804E401B",
+              timezoneOffset: 0
+            }
+          },
+          receivedMessage: {
+            style: 'large',
+            subtitle: 'Please select the time suitable for you',
+            title: 'Appointment with loan specialist'
+          },
+          replyMessage: {
+            style: 'default',
+            title: 'Selected appointment time',
+            subtitle: 'Selected appointment time'
+          }
+        }
+      }
+    };
+    return payload;
+  }
+
+  function createMortgageInfoPayload() {
+    const payload = {
+      content: "Perfect, your appointment with the specialist is set up. You can read more about loan options in here.",
+      metadata: {
+        type: "richLink",
+        richLinkData: {
+          url: "https://www.investopedia.com/terms/l/loan.asp",
+          title: "Perfect, your appointment with the specialist is set up. You can read more about loan options in here.",
+          assets: {
+            video: {
+              url: "https://andreassisask.github.io/snowman/assets/img/13ln9K5TWkNTLa.mp4",
+              mimeType: "video/mp4"
+            }
+          }
+        }
+      }
+    };
+    return payload;
+  }
+
+  function sendTomorrowMortgage() {
+    console.debug("sendTomorrowMortgage");
+
+    getGliaApi({
+      version: 'v1'
+    }).then(glia => {
+      lastReqId = createRequestID();
+
+      let payload = createTomorrowMortgagePayload(lastReqId);
+      console.debug(JSON.stringify(payload));
+      glia.sendChatMessage(payload);
+    });
+
+  }
+
+  function createRequestID() {
+    return Math.floor(Math.random() * 1000000000).toString();
+  }
+
+  function sendMortgageInfo() {
+    console.debug("sendMortgageInfo");
+
+    getGliaApi({
+      version: 'v1'
+    }).then(glia => {
+      let payload = createMortgageInfoPayload();
+      glia.sendChatMessage(payload);
+    });
+
+  }
+
+  function listenForMessages() {
+    getGliaApi({
+      version: 'v1'
+    }).then(glia => {
+      glia.addBufferedEventListener(glia.EVENTS.CHAT_MESSAGES, messages => {
+        // const sentTimePickersList = messages
+        //   .filter(isTimePickerMessage)
+        //   .filter(({
+        //     sender
+        //   }) => sender.type === 'operator')
+        //   .map(({
+        //     metadata
+        //   }) => metadata);
+        // 
+        // const sentTimePickers = sentTimePickersList.reduce(groupByRequestID, {});
+        // 
+        // const requestsByTime = sentTimePickersList.map(extractRequestID);
+        // 
+        const responses = messages
+          .filter(isTimePickerMessage)
+          .filter(({
+            sender
+          }) => sender.type === 'visitor')
+          .map(({
+            metadata
+          }) => metadata);
+
+        if (responses.length > 0) {
+          let resp = responses[0].interactiveData.data.replyMessage.alternateTitle;
+          var cell = document.getElementById("tomorrowMortgageResponseCell");
+          cell.innerText = resp;
+        }
+      });
+    });
+  }
+
+  function isTimePickerMessage({
+    metadata
+  }) {
+    return metadata && metadata.interactiveData && metadata.interactiveData.data && metadata.interactiveData.data.event;
+  }
+
+  listenForMessages();
+</script>
+
+<body>
+  <table class="pure-table" id="msgTbl">
+    <thead>
+      <tr>
+        <th>Loan Type</th>
+        <th>Tomorrow</th>
+        <th>Selected</th>
+        <th>Reminders</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mortgage</td>
+        <td>
+          <button type="button" onclick="sendTomorrowMortgage()">Propose times</button>
+        </td>
+        <td>
+          <div id="tomorrowMortgageResponseCell"></div>
+        </td>
+        <td>
+          <button type="button" onclick="sendMortgageInfo()">Send info</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Personal</td>
+        <td>
+          <button type="button" onclick="sendTomorrowPersonal()">Propose times</button>
+        </td>
+        <td>
+          <div id="tomorrowPersonalResponseCell"></div>
+        </td>
+        <td>
+          <button type="button" onclick="sendPersonalInfo()">Send info</button>
+        </td>
+      </tr>
+      <tr>
+        <td>Auto</td>
+        <td>
+          <button type="button" onclick="sendTomorrowAuto()">Propose times</button>
+        </td>
+        <td>
+          <div id="tomorrowPersonalResponseCell"></div>
+        </td>
+        <td>
+          <button type="button" onclick="sendAutoInfo()">Send info</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>

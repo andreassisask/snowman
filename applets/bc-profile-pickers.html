@@ -1,0 +1,149 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+  <script type="text/javascript" src="https://libs.glia.com/axon.js"></script>
+</head>
+<script>
+  let lastReqId = null;
+
+  function createLoanTypePicker(reqId) {
+    let content = {
+      content: 'Loan type list picker sent.',
+      metadata: {
+        type: 'interactive',
+        interactiveData: {
+          bid: 'com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension',
+          data: {
+            version: '1.0',
+            requestIdentifier: reqId,
+            listPicker: {
+              multipleSelection: true,
+              sections: [{
+                items: [{
+                    identifier: '1',
+                    order: 0,
+                    style: 'default',
+                    subtitle: 'Buy any vehicle suitable for you.',
+                    title: 'Auto'
+                  },
+                  {
+                    identifier: '2',
+                    order: 1,
+                    style: 'default',
+                    subtitle: 'A loan with flexible conditions secured with real estate.',
+                    title: 'Mortgage'
+                  },
+                  {
+                    identifier: '3',
+                    order: 2,
+                    style: 'default',
+                    subtitle: 'Personal loans can be used for a lot of different things—that’s part of the beauty.',
+                    title: 'Personal'
+                  }
+
+                ],
+                order: 0,
+                title: 'Which loan type?'
+              }]
+            }
+          },
+          receivedMessage: {
+            style: 'default',
+            subtitle: 'Please select the loan type you are interested in',
+            title: 'Loan Type'
+          },
+          replyMessage: {
+            style: 'default',
+            title: 'Selected loan type',
+            subtitle: 'Selected loan type'
+          }
+        }
+      }
+    };
+    return content;
+  }
+
+  function sendLoanTypePicker() {
+    console.debug("sendLoanTypePicker");
+
+    getGliaApi({
+      version: 'v1'
+    }).then(glia => {
+      lastReqId = createRequestID();
+      glia.sendChatMessage(createLoanTypePicker(lastReqId));
+    });
+  }
+
+  function createRequestID() {
+    return Math.floor(Math.random() * 1000000000).toString();
+  }
+
+  function listenForMessages() {
+    getGliaApi({
+      version: 'v1'
+    }).then(glia => {
+      glia.addBufferedEventListener(glia.EVENTS.CHAT_MESSAGES, messages => {
+        const responses = messages
+          .filter(isListPickerMessage)
+          .filter(({
+            sender
+          }) => sender.type === 'visitor')
+          .map(({
+            metadata
+          }) => metadata);
+
+        if (responses.length > 0) {
+          resp = responses[0].interactiveData.data.listPicker.sections[0].items[0].title;
+          var cell = document.getElementById("loanTypeResponseCell");
+          cell.innerText = resp;
+        }
+      });
+    });
+  }
+
+  function isListPickerMessage({
+    metadata
+  }) {
+    return metadata && metadata.interactiveData && metadata.interactiveData.data && metadata.interactiveData.data.listPicker;
+  }
+
+  listenForMessages();
+</script>
+
+<body>
+  <table class="pure-table" id="msgTbl">
+    <thead>
+      <tr>
+        <th>Attribute</th>
+        <th>Action</th>
+        <th>Response</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Loan Type</td>
+        <td><button type="button" onclick="sendLoanTypePicker()">Ask</button></td>
+        <td>
+          <div id="loanTypeResponseCell"></div>
+        </td>
+      </tr>
+      <tr>
+        <td>Age Group</td>
+        <td><button type="button" onclick="">Ask</button></td>
+        <td>
+          <div id="ageGroupResponseCell"></div>
+        </td>
+      </tr>
+      <tr>
+        <td>Family Size</td>
+        <td><button type="button" onclick="">Ask</button></td>
+        <td>
+          <div id="familyProfileResponseCell"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+
+</html>
