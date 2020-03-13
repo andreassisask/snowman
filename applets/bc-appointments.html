@@ -6,6 +6,13 @@
   <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
 </head>
 <script>
+  function createSession() {
+    return fetch("https://apple-pay-gateway.beta.salemove.com/session", {
+        method: 'POST'
+      })
+      .then(response => response.json());
+  }
+
   function formatDate(date) {
     return date.toISOString().substring(0, 16) + "+0000";
   };
@@ -89,6 +96,61 @@
     return payload;
   }
 
+  function createMortgagePaymentPayload(merchantSession) {
+
+    const interactiveData = {
+      bid: 'com.apple.messages.MSMessageExtensionBalloonPlugin:0000000000:com.apple.icloud.apps.messages.business.extension',
+      receivedMessage: {
+        title: 'Online loan consultancy',
+        subtitle: 'If you would like to consult immediately, please complete the payment before I transfer you.',
+        style: 'large'
+      },
+      data: {
+        mspVersion: '1.0',
+        requestIdentifier: createRequestID(),
+        payment: {
+          paymentRequest: {
+            requiredBillingContactFields: [],
+            requiredShippingContactFields: [],
+            shippingMethods: [],
+            lineItems: [{
+              label: 'Online loan consultancy',
+              amount: '0.01',
+              type: 'final'
+            }],
+            total: {
+              label: 'Total',
+              amount: '0.01',
+              type: 'final'
+            },
+            currencyCode: 'USD',
+            countryCode: 'US',
+            merchantName: 'Glia Apple Pay',
+            applePay: {
+              supportedNetworks: ['amex', 'visa', 'masterCard', 'discover'],
+              merchantCapabilities: ['supportsDebit', 'supportsCredit', 'supports3DS'],
+              merchantIdentifier: 'merchant.com.glia.applepay'
+            }
+          },
+          merchantSession: merchantSession,
+          endpoints: {
+            paymentGatewayUrl: 'https://apple-pay-gateway.beta.salemove.com/paymentGateway'
+          }
+        }
+      }
+    };
+
+    const payload = {
+      content: 'Payment for online loan consultancy',
+      metadata: {
+        type: 'interactive',
+        interactiveData
+      }
+    };
+
+    return payload
+  }
+
   function sendTomorrowMortgage() {
     console.debug("sendTomorrowMortgage");
 
@@ -118,6 +180,21 @@
       glia.sendChatMessage(payload);
     });
 
+  }
+
+  function sendMortgagePayment() {
+    console.debug("sendMortgagePayment");
+
+    createSession()
+      .then(merchantSession => createMortgagePaymentPayload(
+        merchantSession))
+      .then(payload => {
+        getGliaApi({
+          version: 'v1'
+        }).then(glia => {
+          glia.sendChatMessage(payload);
+        });
+      });
   }
 
   function listenForMessages() {
@@ -173,6 +250,7 @@
         <th>Tomorrow</th>
         <th>Selected</th>
         <th>Reminders</th>
+        <th>Extras</th>
       </tr>
     </thead>
     <tbody>
@@ -187,6 +265,9 @@
         <td>
           <button type="button" onclick="sendMortgageInfo()">Send info</button>
         </td>
+        <td>
+          <button type="button" onclick="sendMortgagePayment()">Paid consultancy</button>
+        </td>
       </tr>
       <tr>
         <td>Personal</td>
@@ -199,6 +280,9 @@
         <td>
           <button type="button" onclick="sendPersonalInfo()">Send info</button>
         </td>
+        <td>
+          <button type="button" onclick="sendPersonalPayment()">Paid consultancy</button>
+        </td>
       </tr>
       <tr>
         <td>Auto</td>
@@ -210,6 +294,9 @@
         </td>
         <td>
           <button type="button" onclick="sendAutoInfo()">Send info</button>
+        </td>
+        <td>
+          <button type="button" onclick="sendAutoPayment()">Paid consultancy</button>
         </td>
       </tr>
     </tbody>
