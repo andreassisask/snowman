@@ -2,12 +2,12 @@
 <html>
 
 <head>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' https://*.salemove.com; style-src 'self' https://*.salemove.com; script-src 'self' 'unsafe-eval' https://*.salemove.com; connect-src wss://*.salemove.com https://*.salemove.com"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; font-src 'self' data:; style-src 'self' 'unsafe-inline' https://*.salemove.com; script-src 'self' 'unsafe-eval' https://*.salemove.com; connect-src wss://*.salemove.com https://*.salemove.com"/>
 
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146480469-1"></script>
-  <script>
+  <!--script async src="https://www.googletagmanager.com/gtag/js?id=UA-146480469-1"></script-->
+  <!--script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
@@ -22,13 +22,13 @@
         }
     }, false);
 
-  </script>
+  </script-->
   <title>Snowman Sign Up</title>
   <script src="//api.salemove.com/salemove_integration.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="assets/css/main.css" />
-  <script>
+  <!--link rel="stylesheet" href="assets/css/main.css" /-->
+  <!--script>
     sm.getApi({version: 'v1'}).then(function(glia) {
 
       function onEngagementStart(engagement) {
@@ -51,7 +51,7 @@
       glia.addEventListener(glia.EVENTS.ENGAGEMENT_START, onEngagementStart);
       glia.addEventListener(glia.EVENTS.ENGAGEMENT_END, onEngagementEnd);
     });
-  </script>
+  </script-->
 </head>
 <body>
   <div align="center" id="div1">
