@@ -6,6 +6,16 @@
   <script src="//ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-146480469-1"></script>
+
+  <script>
+    //Read idtoken from query parameter with the same name.
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+    const idToken = params.idtoken;
+    window.getGliaContext = () => ({ idToken });
+  </script>
+
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -46,7 +56,7 @@
   </script>
   <script>
     var engagement = null;
-    
+
     function onQueueStateUpdate(queueState) {
       console.debug("Queue state updated: " + queueState);
       const element = document.querySelector('[data-sm-show-media-selection-on]');
@@ -56,16 +66,16 @@
         element.style.display = 'block';
       }
     }
-    
+
     function onEngagementStart(eng) {
       console.log("Engagement started: " + eng.engagementId);
       engagement = eng;
     }
-    
+
     sm.getApi({
       version: 'v1'
     }).then(function(glia) {
-      
+
       glia.addEventListener(glia.EVENTS.ENGAGEMENT_START, onEngagementStart);
       glia.addEventListener(glia.EVENTS.QUEUE_STATE_UPDATE, onQueueStateUpdate);
     });
@@ -78,12 +88,12 @@
       }).then(function(glia) {
         if (glia.isInEngagement()) {
           if (e.cobraTriggered) {
-            engagement.recordEvent({message: "Operator clicked login."});  
+            engagement.recordEvent({message: "Operator clicked login."});
           } else {
-            engagement.recordEvent({message: "Visitor clicked login."});  
+            engagement.recordEvent({message: "Visitor clicked login."});
           }
         }
-                  
+
         var params = {
           "authentication_provider_id": "289d329f-02d6-4d2e-8c42-d3c7d542a2c3",
           "webhooks": []
